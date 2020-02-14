@@ -81,9 +81,15 @@
         }
 
         // Method handles POST request
-        public function insertOne($query, $body, $id, $category_id, $date){
+        public function insertOne($query, $body, $user_id, $category_id, $date){
             $stmt = $this->pdo->prepare($query);
             $stmt->execute([$body, $category_id, $date, $id]);
+        }
+
+        // Method handles PUT request
+        public function insertUser($query, $firstName, $lastName, $password, $username){
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute([$firstName, $lastName, $password, $username]);
         }
 
         // Method handles PUT request
