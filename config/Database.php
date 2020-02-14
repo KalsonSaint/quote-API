@@ -47,7 +47,7 @@
         }
 
         // Method keeps track of  Calls made to the API
-        public function executeCall($username,$call_allowed,$timeoutSecs) {
+        public function executeCall($username, $calls_allowed, $timeoutSecs) {
             $query ="SELECT plan, calls_made, time_start, time_end FROM users WHERE username = '$username'";
             $stmt=$this->pdo->prepare($query);
             $stmt->execute([$username]);
@@ -69,7 +69,7 @@
                 $stmt->execute([$username]);
                 return  $result;
             } else{
-                if($timeOut === false && $calls_made >= $call_allowed){
+                if($timeOut === false && $result['calls_made'] >= $calls_allowed){
                     return -1;
                 } else{
                     // grant access
@@ -80,6 +80,23 @@
             }
         }
 
+        // Method handles POST request
+        public function insertOne($query, $body, $id, $category_id, $date){
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute([$body, $category_id, $date, $id]);
+        }
+
+        // Method handles PUT request
+        public function updateOne($query, $body, $category_id, $date, $id){
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute([$body, $category_id, $date, $id]);
+        }
+
+        // Method handles DELETE request
+        public function deleteOne($query, $id){
+            $stmt = $this->pdo->prepapre($query);
+            $stmt->execute([$id]);
+        }
     }
 
 
