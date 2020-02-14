@@ -48,11 +48,7 @@
 
         // Method keeps track of  Calls made to the API
         public function executeCall($username,$call_allowed,$timeoutSecs) {
-            $query ="   
-                        SELECT plan, calls_made, time_start, time_end
-                        FROM users
-                        WHERE username = '$username'
-                    ";
+            $query ="SELECT plan, calls_made, time_start, time_end FROM users WHERE username = '$username'";
             $stmt=$this->pdo->prepare($query);
             $stmt->execute([$username]);
             $result = $stmt->fetch();
@@ -60,11 +56,28 @@
             $timeOut = date(time()) - $result['time_start'] >= $timeOutSeconds || $result['time_start'] === 0;
 
             // update calls made in respect to timeout
-            $query ="
-                        UPDATE users
-                        SET calls_made
-                    ";
-            $query .= $timeout ?
+            $query = "UPDATE users SET calls_made";
+            $query .= $timeOut ? " 1, time_start = ".date(time()). " , time_end = ".strtotime("+ $timeOutSeconds seconds"): " calls_made + 1";
+            $query .= "WHERE username = ?";
+
+            $result['call_made'] = $timeOut ? 1 : $calls_made + 1;
+            $result['time_end'] = $timeOut ? strtotime(" + $timeOutSeconds seconds") : $result['time_end'];
+
+            // validate users subscription(plans)
+            if($result['plan'] === 'unlimited'){
+                $stmt = $this->pdo->prepare($query);
+                $stmt->execute([$username]);
+                return  $result;
+            } else{
+                if($timeOut === false && $calls_made >= $call_allowed){
+                    return -1;
+                } else{
+                    // grant access
+                    $stmt = $this->pdo->prepare($query);
+                    $stmt->execute([$username]);
+                    return $results;
+                }
+            }
         }
 
     }
