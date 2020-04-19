@@ -10,3 +10,26 @@
 
     $db = new Database();
     $quote = new Quote($db);
+    $http = new HttpResponse();
+
+    if(!isset($_SESSION['PHP_AUTH_USER']) && !isset($_SERVER['PHP_AUTH_PW'])){
+        $http->notAuthorized("Access Denied. Authentication Needed");
+        exit();
+    } else {
+        $username = $_SERVER['PHP_AUTH_USER'];
+        $password = $_SERVER['PHP_AUTH_PW'];
+        $query = "SELECT * FROM users WHERE username=?";
+        $result = $db->fetchOne($query, $username);
+        if($result === 0 || $result['password'] !== $password){
+            $http->notAuthorized("Wrong Details");
+            exit();
+        } else{
+            $user_id = $result['id'];
+        }
+    }
+
+
+    // Check incoming GET requests
+    if($_SERVER['REQUET_METHOD'] === 'GET '){
+        if(isset($_GET['id']) && !filter_var($_GET['id'], FILTER_VALIDATE_INT))
+    }
