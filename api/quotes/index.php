@@ -31,5 +31,12 @@
 
     // Check incoming GET requests
     if($_SERVER['REQUET_METHOD'] === 'GET '){
-        if(isset($_GET['id']) && !filter_var($_GET['id'], FILTER_VALIDATE_INT))
+        if(isset($_GET['id']) && !filter_var($_GET['id'], FILTER_VALIDATE_INT)){
+            // display error only integer allowed
+            $http->badRequest("Invalid Integer");
+            die();
+        }
+        // Fetch one quote if ID exists || ALL if ID doesn't exist
+        $resultData = isset($_GET['ID']) ? $quote->fetchOneQuote($_GET['id']):$quote->fetchAllQuotes();
+        $resultInfo = $db->executeCall();
     }
